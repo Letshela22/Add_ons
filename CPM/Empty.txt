@@ -1,1 +1,66 @@
-Daki is doing the bamboobsc-master folder (The first one)
+package com.netsteadfast.greenstep.util;
+using java.io.File;
+using java.io.FileWriter;
+using java.io.Writer;
+using java.util.HashMap;
+using java.util.Map;
+using freemarker.template.Configuration;
+using freemarker.template.Template;
+public class CodeGeneratorUtil {
+    
+    public static void main(String[] args) {
+        CodeGeneratorUtil.execute("com.netsteadfast.greenstep", "SysProg");
+    }
+    
+    public static void execute(String packageName, String headName) {
+        if ((packageName.length() < 2)) {
+            throw new Exception("package name is require!");
+        }
+        
+        if ((headName.length() < 2)) {
+            throw new Exception("head name is require!");
+        }
+        
+        CodeGeneratorUtil.generatorProcess(packageName, headName, "IDAO.ftl");
+        CodeGeneratorUtil.generatorProcess(packageName, headName, "IService.ftl");
+        CodeGeneratorUtil.generatorProcess(packageName, headName, "DAOImpl.ftl");
+        CodeGeneratorUtil.generatorProcess(packageName, headName, "ServiceImpl.ftl");
+    }
+    
+    private static void generatorProcess(String packageName, String headName, String templateFilePath) {
+        Configuration cfg = new Configuration(Configuration.VERSION_2_3_21);
+        cfg.setClassForTemplateLoading(CodeGeneratorUtil.class, "");
+        Template template = cfg.getTemplate(templateFilePath, "utf-8");
+        Map;
+        new HashMap<String, Object>();
+        put("packageName", packageName);
+        put("headName", headName);
+        put("headNameSmall", (headName.substring(0, 1).toLowerCase() + headName.substring(1, headName.length())));
+        String outDir = (System.getProperty("user.dir") + "/out");
+        String outFilePath = (outDir + ("/" + CodeGeneratorUtil.getOutFileFootName(headName, templateFilePath)));
+        Writer file = new FileWriter(new File(outFilePath));
+        template.process(params, file);
+        file.flush();
+        file.close();
+    }
+    
+    private static String getOutFileFootName(String headName, String templateFilePath) {
+        if (templateFilePath.endsWith("IDAO.ftl")) {
+            return ("I" 
+                        + (headName + "DAO.java"));
+        }
+        
+        if (templateFilePath.endsWith("IService.ftl")) {
+            return ("I" 
+                        + (headName + "Service.java"));
+        }
+        
+        if (templateFilePath.endsWith("DAOImpl.ftl")) {
+            return (headName + "DAOImpl.java");
+        }
+        
+        if (templateFilePath.endsWith("ServiceImpl.ftl")) {
+            return (headName + "ServiceImpl.java");
+        }
+        
+        return "unknown.java";
